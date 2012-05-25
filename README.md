@@ -24,5 +24,5 @@ Envi "is not vi"
 
 > Envi will be vi-based (? what do you think)
 
-Watch the repository if you want to get involved
+Watch the repository if you want to get involved + #envi (freenode)
  
