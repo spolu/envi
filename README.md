@@ -4,7 +4,7 @@ Envi "is not vi"
 > Envi will be a web-based collaborative editor built with the following 4 principles in mind:
 
 - `distributed`   : you can edit files from any of the computer running envi you have access to
-- `no mouse`      : envi aim at being as close as possible to command-line based
+- `no mouse`      : envi aim at being as close as possible to command-line based editors
 - `open-source`   : envi local server as well as synchronization servers will be entirely opensource
 - `collaborative` : you can see what your team mates are working on realtime
 
