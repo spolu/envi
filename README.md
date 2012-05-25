@@ -1,6 +1,5 @@
-==================
- Envi "is not vi"
-==================
+Envi "is not vi"
+----------------
 
 > Envi will be a web-based collaborative editor built with the following 4 principles in mind:
 
