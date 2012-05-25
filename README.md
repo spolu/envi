@@ -23,4 +23,5 @@ Envi will be based on:
 
 Envi will be vi-based (? what do you think)
 
+>>> Watch the repository if you want to get involved
  
