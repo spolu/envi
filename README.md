@@ -11,12 +11,14 @@
 
 
 > Envi will be made of:
+
 - `envi-srv`  : a local server running on each machine you want to edit from 
 - `envi-sync` : a synchronization server for WLAN accessibility, access-control and realtime collaboration.
 - `envi`      : a local executable letting you open local files in your browser from the command-line
 
 
 > Envi will be based on:
+
 - `ace`    : the web-based editor built for c9 IDE
 - `nodeJS`
 
