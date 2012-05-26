@@ -1,6 +1,7 @@
 Envi "is not vi"
 ----------------
 
+> `envi` is like if `vim` had a children with `dwm` at a party hosted by `mosaic`
 > Envi will be a web-based collaborative editor built with the following 4 principles in mind:
 
 - `distributed`   : you can edit files from any of the computer running envi you have access to
