@@ -26,5 +26,5 @@ envi "is not vi"
 
 > `envi` will be vi-based (? what do you think)
 
-Get involved + #envi (freenode)
+Get involved: #envi (freenode irc)
  
