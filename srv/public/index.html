@@ -1,0 +1,32 @@
+<!doctype HTML>
+<html>
+  <head>
+    <title>envi</title>
+    <link href="assets/css/main.css" media="screen" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <div id="editor">some text</div>
+    
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/lib/cell-0.3.min.js"></script>
+    <script src="/lib/jquery-1.7.2.min.js"></script>
+    <script src="/lib/ace/ace.js"></script>
+    <script>
+      $(document).ready(function () {
+        var editor = ace.edit("editor");
+
+
+        var socket = io.connect('/');
+        socket.on('ping', function (data) {
+          //document.getElementById("msg").innerHTML = data.msg;
+          socket.emit('pong', {
+            msg: "The web browser also knows socket.io."
+          });
+        });
+      });
+    </script>
+
+  </body>
+</html>
