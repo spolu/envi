@@ -3,30 +3,22 @@
   <head>
     <title>envi</title>
     <link href="assets/css/main.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="assets/css/cli.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="assets/css/tile.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <div id="editor">some text</div>
+    <div id="envi-top"></div> 
     
-    
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/lib/cell-0.3.min.js"></script>
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
     <script src="/lib/jquery-1.7.2.min.js"></script>
+    <script src="/lib/cell-0.3.min.js"></script>
     <script src="/lib/ace/ace.js"></script>
-    <script>
-      $(document).ready(function () {
-        var editor = ace.edit("editor");
 
+    <script src="/assets/js/ace_theme/theme-envi.js"></script>
 
-        var socket = io.connect('/');
-        socket.on('ping', function (data) {
-          //document.getElementById("msg").innerHTML = data.msg;
-          socket.emit('pong', {
-            msg: "The web browser also knows socket.io."
-          });
-        });
-      });
-    </script>
-
+    <script src="/assets/js/cli_c.js"></script>
+    <script src="/assets/js/tile_c.js"></script>
+    <script src="/assets/js/main_ct.js"></script>
   </body>
 </html>
