@@ -43,6 +43,8 @@ var main_ct = function(spec, my) {
     editor.session.setFoldStyle('manual');
     editor.setShowFoldWidgets(false);
     editor.setShowInvisibles(true);
+    //editor.setKeyboardHandler(require("ace/keyboard/vim").handler);
+    editor.setKeyboardHandler(require("ace/keyboard/envi").handler);
   };
 
   CELL.method(that, 'load', load, _super);

@@ -1,0 +1,56 @@
+ACTIONS:
+    "~": {
+        param: true,
+        fn: function(editor, range, count, param) {
+        }
+    },
+
+REGISTERS:
+    _default: {
+        text: "",
+        isLine: false
+    }
+
+
+MOTIONS:
+    "w": {
+        param: true,
+        handlesCount: true, 
+        nav: function(editor) {
+        },
+        sel: function(editor) {
+        }
+    },
+
+
+OEPERATORS:
+    "d": {
+        selFn: function(editor, range, count, param) {
+        },
+        fn: function(editor, range, count, param) {
+        }
+    },
+
+
+ALIASES:
+    ".": {
+        operator: {
+            char: ".",
+            count: 1
+        },
+        motion: {
+            char: ".",
+            count: 1
+        }
+    },
+
+>>>>
+
+OPERATOR:
+{ "d": { fn: function(editor, range, count, param) {} } 
+  "dd": { fn: function(editor, range, count, param) {} }
+
+MOTIONS:
+{ "b": { sel: function(editor, count),
+         nav: function(editor, count) } }
+  

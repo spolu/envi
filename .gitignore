@@ -16,5 +16,5 @@ npm-debug.log
 
 *~
 .DS_Store
-.swp
-.tmp
+*.swp
+*.tmp
