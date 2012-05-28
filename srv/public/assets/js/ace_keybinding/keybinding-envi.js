@@ -229,7 +229,7 @@ define('ace/keyboard/envi/normal',
                'i$': function(match) {
                  that.setInsertMode();
                },
-               '([1-9]*)(h|j|k|l|\\$|\\^)$': function(match) {
+               '([1-9]*)(h|j|k|l|\\$|\\^|0)$': function(match) {
                  if(match[1].length === 0)
                    match[1] = '1';
                  if(motions[match[2]]) {
@@ -552,6 +552,16 @@ define('ace/keyboard/envi/motions',
              },
              else: function(editor, count) {
                editor.selection.selectLineStart();
+             }
+           },
+           "0": {
+             nav: function(editor, count) {
+               var pos = editor.getCursorPosition();
+               editor.navigateTo(pos.row, 0);
+             },
+             else: function(editor, count) {
+               var pos = editor.getCursorPosition();
+               editor.selectTo(pos.row, 0);
              }
            }
          };
