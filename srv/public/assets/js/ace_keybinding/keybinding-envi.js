@@ -182,14 +182,23 @@ define('ace/keyboard/envi/mode',
 /*****************************/
 define('ace/keyboard/envi/normal',
        ['require', 'exports', 'module', 'ace/lib/keys', 
-        'ace/keyboard/envi/mode'],
+        'ace/keyboard/envi/mode', 'ace/keyboard/envi/motions'],
        function(require, exports, module) {
          "use strict"
 
          var mode = require('./mode').mode;
+         var motions = require('./motions');
+
+         require('../../lib/dom').importCssString('\
+           .envi-normal-mode .ace_cursor{\
+             border: 0!important;\
+             background-color: red;\
+             opacity: 0.5;\
+           }', 'enviNormalMode');
+           
 
          /**
-          * Envi Normal Mode 
+          * Envi Normal Mode
           *
           * In charge of handling envi normal mode
           * 
@@ -215,8 +224,30 @@ define('ace/keyboard/envi/normal',
             * @returns the generated editor command
             */
            exec = function() {
-             if(/i$/.test(my.buffer)) {
-               that.setInsertMode();
+             // LIST OF NORMAL MODE COMMANDS
+             var cmds = { 
+               'i$': function(match) {
+                 that.setInsertMode();
+               },
+               '([1-9]*)(h|j|k|l|\\$|\\^)$': function(match) {
+                 if(match[1].length === 0)
+                   match[1] = '1';
+                 if(motions[match[2]]) {
+                   motions[match[2]].nav(my.editor, parseInt(match[1], 10));
+                   my.buffer = '';
+                 }
+               }
+             };
+
+             for(var p in cmds) {
+               if(cmds.hasOwnProperty(p)) {
+                 var r = new RegExp(p);
+                 var m = r.exec(my.buffer);
+                 if(m) { 
+                   cmds[p](m);
+                   break;
+                 }
+               }
              }
              return { command: "null" };
            };
@@ -228,12 +259,14 @@ define('ace/keyboard/envi/normal',
            attach = function() {
              my.editor.clearSelection();
              my.editor.setOverwrite(true);
+             my.editor.setStyle('envi-normal-mode');
            };
 
            /**
             * Called by base class when the mode is extied
             */
            detach = function() {
+             my.editor.unsetStyle('envi-normal-mode');
            };
 
            
@@ -257,6 +290,12 @@ define('ace/keyboard/envi/insert',
          "use strict"
 
          var mode = require('./mode').mode;
+
+         require('../../lib/dom').importCssString('\
+           .envi-insert-mode .ace_cursor {\
+             border-left: 2px solid #111;\
+           }', 'enviInsertMode');
+
 
          /**
           * Envi Insert  Mode 
@@ -283,12 +322,14 @@ define('ace/keyboard/envi/insert',
             */ 
            attach = function() {
              my.editor.setOverwrite(false);
+             my.editor.setStyle('envi-insert-mode');
            };
 
            /**
             * Called by base class when the mode is extied
             */
            detach = function() {
+             my.editor.unsetStyle('envi-insert-mode');
            };
 
 
@@ -336,12 +377,14 @@ define('ace/keyboard/envi/visual',
             */ 
            attach = function() {
              my.editor.setOverwrite(false);
+             my.editor.setStyle('envi-visual-mode');
            };
 
            /**
             * Called by base class when the mode is extied
             */
            detach = function() {
+             my.editor.unsetStyle('envi-visual-mode');
            };
 
 
@@ -389,12 +432,14 @@ define('ace/keyboard/envi/visual_line',
             */ 
            attach = function() {
              my.editor.setOverwrite(false);
+             my.editor.setStyle('envi-visual-mode');
            };
 
            /**
             * Called by base class when the mode is extied
             */
            detach = function() {
+             my.editor.unsetStyle('envi-visual-mode');
            };
 
 
@@ -405,3 +450,110 @@ define('ace/keyboard/envi/visual_line',
          };
        }); 
 
+
+/*****************************/
+/*   ENVI MOTIONS            */
+/*****************************/
+define('ace/keyboard/envi/motions',
+       ['require', 'exports', 'module', 'ace/search', 'ace/range'],
+       function(require, exports, module) {
+         "use strict"
+
+         module.exports = {
+           'h': {
+             nav: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 if(pos.column > 0)
+                   editor.navigateLeft();
+               }
+             },
+             sel: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 if(pos.column > 0)
+                   editor.selection.selectLeft();
+               }
+             }
+           },
+           'j': {
+             nav: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 if(pos.row < editor.session.getLength() - 1) {
+                   editor.navigateDown();
+                   pos = editor.getCursorPosition();
+                   var len = editor.session.getLine(pos.row).length;
+                   if(pos.column > len - 1)
+                     editor.navigateLeft();
+                 }
+               }
+             },
+             sel: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 if(pos.row < editor.session.getLength() - 1)
+                   editor.selection.selectDown();
+               }
+             }
+           },
+           'k': {
+             nav: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 if(pos.row > 0) {
+                   editor.navigateUp();
+                   pos = editor.getCursorPosition();
+                   var len = editor.session.getLine(pos.row).length;
+                   if(pos.column > len - 1)
+                     editor.navigateLeft();
+                 }
+               }
+             },
+             sel: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 if(pos.row > 0)
+                   editor.selection.navigateUp();
+               }
+             }
+           },
+           'l': {
+             nav: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 var len = editor.session.getLine(pos.row).length ;
+                 if(len && pos.column < len - 1)
+                   editor.navigateRight();
+               }
+             },
+             sel: function(editor, count) {
+               while(0 < count--) {
+                 var pos = editor.getCursorPosition();
+                 var len = editor.session.getLine(pos.row).length;
+                 if(len && pos.column < len)
+                   editor.selection.selectRight();
+               }
+             }
+           },
+           "$": {
+             nav: function(editor, count) {
+               editor.navigateLineEnd();
+               editor.navigateLeft();
+             },
+             else: function(editor, count) {
+               editor.selection.selectLineEnd();
+               editor.selection.selectLeft();
+             }
+           },
+           "^": {
+             nav: function(editor, count) {
+               editor.navigateLineStart();
+             },
+             else: function(editor, count) {
+               editor.selection.selectLineStart();
+             }
+           }
+         };
+
+       });

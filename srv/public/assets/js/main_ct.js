@@ -38,11 +38,12 @@ var main_ct = function(spec, my) {
     top.append(my.children['tile'].build());
     
     // test
+    $('#envi-tile').html('test here\nok\nhophop');
     var editor = ace.edit('envi-tile');
     editor.setTheme("ace/theme/envi");
     editor.session.setFoldStyle('manual');
     editor.setShowFoldWidgets(false);
-    editor.setShowInvisibles(true);
+    //editor.setShowInvisibles(true);
     //editor.setKeyboardHandler(require("ace/keyboard/vim").handler);
     editor.setKeyboardHandler(require("ace/keyboard/envi").handler);
   };
@@ -52,4 +53,3 @@ var main_ct = function(spec, my) {
 
   return that;
 };
-
