@@ -51,6 +51,5 @@ OPERATOR:
   "dd": { fn: function(editor, range, count, param) {} }
 
 MOTIONS:
-{ "b": { sel: function(editor, count),
-         nav: function(editor, count) } }
+{ "b": function(editor, count, pos) }   // returns an updated position
   

@@ -233,7 +233,10 @@ define('ace/keyboard/envi/normal',
                  if(match[1].length === 0)
                    match[1] = '1';
                  if(motions[match[2]]) {
-                   motions[match[2]].nav(my.editor, parseInt(match[1], 10));
+                   var dst = motions[match[2]](my.editor, 
+                     parseInt(match[1], 10),
+                     my.editor.getCursorPosition());
+                   my.editor.navigateTo(dst.row, dst.column);
                    my.buffer = '';
                  }
                }
@@ -460,109 +463,59 @@ define('ace/keyboard/envi/motions',
          "use strict"
 
          module.exports = {
-           'h': {
-             nav: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 if(pos.column > 0)
-                   editor.navigateLeft();
-               }
-             },
-             sel: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 if(pos.column > 0)
-                   editor.selection.selectLeft();
-               }
+           'h': function(editor, count, pos) {
+             while(0 < count-- && pos.column > 0) {
+               pos.column--;
              }
+             editor.keyBinding.$data.cursor_column = pos.column;
+             return pos;
            },
-           'j': {
-             nav: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 if(pos.row < editor.session.getLength() - 1) {
-                   editor.navigateDown();
-                   pos = editor.getCursorPosition();
-                   var len = editor.session.getLine(pos.row).length;
-                   if(pos.column > len - 1)
-                     editor.navigateLeft();
-                 }
-               }
-             },
-             sel: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 if(pos.row < editor.session.getLength() - 1)
-                   editor.selection.selectDown();
-               }
+           'l': function(editor, count, pos) {
+             var len = editor.session.getLine(pos.row).length;
+             while(0 < count-- && pos.column < len - 1) {
+               pos.column++;
              }
+             editor.keyBinding.$data.cursor_column = pos.column;
+             return pos;
            },
-           'k': {
-             nav: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 if(pos.row > 0) {
-                   editor.navigateUp();
-                   pos = editor.getCursorPosition();
-                   var len = editor.session.getLine(pos.row).length;
-                   if(pos.column > len - 1)
-                     editor.navigateLeft();
-                 }
-               }
-             },
-             sel: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 if(pos.row > 0)
-                   editor.selection.navigateUp();
-               }
+           'j': function(editor, count, pos) {
+             while(0 < count-- && pos.row < editor.session.getLength() - 1) {
+               pos.row++;
+               var len = editor.session.getLine(pos.row).length;
+               if(pos.column < editor.keyBinding.$data.cursor_column)
+                 pos.column = editor.keyBinding.$data.cursor_column;
+               if(pos.column > len - 1)
+                 pos.column = len - 1;
              }
+             return pos;
            },
-           'l': {
-             nav: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 var len = editor.session.getLine(pos.row).length ;
-                 if(len && pos.column < len - 1)
-                   editor.navigateRight();
-               }
-             },
-             sel: function(editor, count) {
-               while(0 < count--) {
-                 var pos = editor.getCursorPosition();
-                 var len = editor.session.getLine(pos.row).length;
-                 if(len && pos.column < len)
-                   editor.selection.selectRight();
-               }
+           'k': function(editor, count, pos) {
+             while(0 < count-- && pos.row > 0) {
+               pos.row--;
+               var len = editor.session.getLine(pos.row).length;
+               if(pos.column < editor.keyBinding.$data.cursor_column)
+                 pos.column = editor.keyBinding.$data.cursor_column;
+               if(pos.column > len - 1)
+                 pos.column = len - 1;
              }
+             return pos;
            },
-           "$": {
-             nav: function(editor, count) {
-               editor.navigateLineEnd();
-               editor.navigateLeft();
-             },
-             else: function(editor, count) {
-               editor.selection.selectLineEnd();
-               editor.selection.selectLeft();
-             }
+           "$": function(editor, count, pos) {
+             var len = editor.session.getLine(pos.row).length;
+             pos.column = len - 1;
+             editor.keyBinding.$data.cursor_column = pos.column;
+             return pos;
            },
-           "^": {
-             nav: function(editor, count) {
-               editor.navigateLineStart();
-             },
-             else: function(editor, count) {
-               editor.selection.selectLineStart();
-             }
+           "^": function(editor, count, pos) {
+             var line = editor.session.getLine(pos.row);
+             pos.column = /^\s*/.exec(line)[0].length;
+             editor.keyBinding.$data.cursor_column = pos.column;
+             return pos;
            },
-           "0": {
-             nav: function(editor, count) {
-               var pos = editor.getCursorPosition();
-               editor.navigateTo(pos.row, 0);
-             },
-             else: function(editor, count) {
-               var pos = editor.getCursorPosition();
-               editor.selectTo(pos.row, 0);
-             }
+           "0": function(editor, count, pos) {
+             pos.column = 0;
+             editor.keyBinding.$data.cursor_column = pos.column;
+             return pos;
            }
          };
 
