@@ -38,7 +38,7 @@ var main_ct = function(spec, my) {
     top.append(my.children['tile'].build());
     
     // test
-    $('#envi-tile').html('test here\nok\nhophop');
+    $('#envi-tile').html('test here\nvar it = fucntion() {\n}\n\nok\nhophop');
     var editor = ace.edit('envi-tile');
     editor.setTheme("ace/theme/envi");
     editor.session.setFoldStyle('manual');

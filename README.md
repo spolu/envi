@@ -1,5 +1,5 @@
-envi "is not vi"
-----------------
+Envi is Not VI
+--------------
 
 > `envi` is like if `vim` had a children with `dwm` at a party hosted by `mosaic`
 

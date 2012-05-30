@@ -229,7 +229,7 @@ define('ace/keyboard/envi/normal',
                'i$': function(match) {
                  that.setInsertMode();
                },
-               '([1-9]*)(h|j|k|l|\\$|\\^|0)$': function(match) {
+               '([1-9]*)(h|j|k|l|\\$|\\^|0|e|w)$': function(match) {
                  if(match[1].length === 0)
                    match[1] = '1';
                  if(motions[match[2]]) {
@@ -462,6 +462,82 @@ define('ace/keyboard/envi/motions',
        function(require, exports, module) {
          "use strict"
 
+         /**
+          * Helper Regular Expressions
+          */
+         var wht_spc = /\s/;
+         var wrd_sep = /[.\/\\()\"'-:,.;<>~!@#$%^&*|+=\[\]{}`~?]/;
+
+         /**
+          * Stream object
+          *
+          * Allow to stream characters from a given
+          * position as if iterating over a string
+          *
+          * @param spec {editor, pos}
+          */
+         var stream = function(spec, my) {
+           my = my || {};
+
+           my.editor = spec.editor;
+           my.pos = { column: spec.pos.column, row: spec.pos.row };
+           my.line = my.editor.session.getLine(my.pos.row);
+           my.chr = my.line[my.pos.column] || '\n';
+
+           // public
+           var next;
+           var prev;
+
+           // private
+           var next_line;
+           var prev_line;
+           
+           var that = {};
+
+           next = function() {
+             my.chr = my.line[++my.pos.column] || next_line()
+             return my.chr;
+           };
+           
+           prev = function() {
+             my.chr = my.line[--my.pos.column] || prev_line();
+             return my.chr;
+           };
+
+           next_line = function() {
+             if(my.pos.row === my.editor.session.getLength() - 1)
+               return;
+             // will retrun \n at end of line and go to next line 
+             // for my.pos.row === my.line.length + 1
+             if(my.pos.column === my.line.length)
+               return '\n';
+             my.pos.column = 0;
+             my.pos.row++;
+             my.line = my.editor.session.getLine(my.pos.row);
+             return my.line[0] || '\n';
+           };
+
+           prev_line = function() {
+             if(my.pos.row === 0)
+               return;
+             my.pos.row--;
+             my.line = my.editor.session.getLine(my.pos.row);
+             my.pos.column = my.line.length;
+             return '\n';
+           };
+
+           that.next = next;
+           that.prev = prev;
+           that.chr = function() { return my.chr; };
+           that.pos = function() { return my.pos; };
+           
+           return that;
+         }; 
+
+
+         /*************************/
+         /*  MOTIONS IMPL         */
+         /*************************/
          module.exports = {
            'h': function(editor, count, pos) {
              while(0 < count-- && pos.column > 0) {
@@ -500,23 +576,60 @@ define('ace/keyboard/envi/motions',
              }
              return pos;
            },
-           "$": function(editor, count, pos) {
+           '$': function(editor, count, pos) {
              var len = editor.session.getLine(pos.row).length;
              pos.column = len - 1;
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           "^": function(editor, count, pos) {
+           '^': function(editor, count, pos) {
              var line = editor.session.getLine(pos.row);
              pos.column = /^\s*/.exec(line)[0].length;
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           "0": function(editor, count, pos) {
+           '0': function(editor, count, pos) {
              pos.column = 0;
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
+           },
+           'e': function(editor, count, pos) {
+             var str = stream({editor: editor, pos: pos});
+             
+             str.next();
+             while(str.chr() && wht_spc.test(str.chr())) str.next();
+
+             if(str.chr() && wrd_sep.test(str.chr())) {
+               while(str.chr() && wrd_sep.test(str.chr())) str.next();
+             }
+             else { 
+               while(str.chr() && !wrd_sep.test(str.chr()) && 
+                     !wht_spc.test(str.chr())) str.next();
+             }
+             str.prev(); 
+
+             editor.keyBinding.$data.cursor_column = str.pos().column;
+             return str.pos();
+           },
+           'w': function(editor, count, pos) {
+             var str = stream({editor: editor, pos: pos});
+
+             if(str.chr() && wrd_sep.test(str.chr())) {
+               while(str.chr() && wrd_sep.test(str.chr())) str.next();
+             }
+             else {
+               while(str.chr() && !wrd_sep.test(str.chr()) && 
+                     !wht_spc.test(str.chr())) str.next();
+             }
+
+             while(str.chr() && wht_spc.test(str.chr())) str.next();
+             if(!str.chr()) str.prev();
+
+             editor.keyBinding.$data.cursor_column = str.pos().column;
+             return str.pos();
            }
          };
+         //var wht_spc = /\s/;
+         //var wrd_sep = /[\s.\/\\()\"'-:,.;<>~!@#$%^&*|+=\[\]{}`~?]/;
 
        });
