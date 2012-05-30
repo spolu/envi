@@ -229,14 +229,16 @@ define('ace/keyboard/envi/normal',
                'i$': function(match) {
                  that.setInsertMode();
                },
-               '([1-9]*)(h|j|k|l|\\$|\\^|0|e|w)$': function(match) {
+               '([1-9]*)(h|j|k|l|\\$|\\^|0|e|E|w)$': function(match) {
                  if(match[1].length === 0)
                    match[1] = '1';
                  if(motions[match[2]]) {
-                   var dst = motions[match[2]](my.editor, 
-                     parseInt(match[1], 10),
-                     my.editor.getCursorPosition());
-                   my.editor.navigateTo(dst.row, dst.column);
+                   var count = parseInt(match[1], 10);
+                   while(0 < count--) {
+                     var pos = my.editor.getCursorPosition();
+                     var dst = motions[match[2]](my.editor, pos); 
+                     my.editor.navigateTo(dst.row, dst.column);
+                   }
                    my.buffer = '';
                  }
                }
@@ -539,23 +541,23 @@ define('ace/keyboard/envi/motions',
          /*  MOTIONS IMPL         */
          /*************************/
          module.exports = {
-           'h': function(editor, count, pos) {
-             while(0 < count-- && pos.column > 0) {
+           'h': function(editor, pos) {
+             if(pos.column > 0) {
                pos.column--;
              }
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           'l': function(editor, count, pos) {
+           'l': function(editor, pos) {
              var len = editor.session.getLine(pos.row).length;
-             while(0 < count-- && pos.column < len - 1) {
+             if(pos.column < len - 1) {
                pos.column++;
              }
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           'j': function(editor, count, pos) {
-             while(0 < count-- && pos.row < editor.session.getLength() - 1) {
+           'j': function(editor, pos) {
+             if(pos.row < editor.session.getLength() - 1) {
                pos.row++;
                var len = editor.session.getLine(pos.row).length;
                if(pos.column < editor.keyBinding.$data.cursor_column)
@@ -565,8 +567,8 @@ define('ace/keyboard/envi/motions',
              }
              return pos;
            },
-           'k': function(editor, count, pos) {
-             while(0 < count-- && pos.row > 0) {
+           'k': function(editor, pos) {
+             if(pos.row > 0) {
                pos.row--;
                var len = editor.session.getLine(pos.row).length;
                if(pos.column < editor.keyBinding.$data.cursor_column)
@@ -576,24 +578,24 @@ define('ace/keyboard/envi/motions',
              }
              return pos;
            },
-           '$': function(editor, count, pos) {
+           '$': function(editor, pos) {
              var len = editor.session.getLine(pos.row).length;
              pos.column = len - 1;
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           '^': function(editor, count, pos) {
+           '^': function(editor, pos) {
              var line = editor.session.getLine(pos.row);
              pos.column = /^\s*/.exec(line)[0].length;
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           '0': function(editor, count, pos) {
+           '0': function(editor, pos) {
              pos.column = 0;
              editor.keyBinding.$data.cursor_column = pos.column;
              return pos;
            },
-           'e': function(editor, count, pos) {
+           'e': function(editor, pos) {
              var str = stream({editor: editor, pos: pos});
              
              str.next();
@@ -611,7 +613,22 @@ define('ace/keyboard/envi/motions',
              editor.keyBinding.$data.cursor_column = str.pos().column;
              return str.pos();
            },
-           'w': function(editor, count, pos) {
+           'E': function(editor, pos) {
+             var str = stream({editor: editor, pos: pos});
+
+             var cur = str.next();
+             var nxt = str.next();
+             while(str.chr() && !(!wht_spc.test(cur) && wht_spc.test(nxt))) {
+               console.log('cur: ' + cur + ' nxt: ' + nxt);
+               cur = nxt;
+               nxt = str.next();
+             }
+             str.prev();
+             
+             editor.keyBinding.$data.cursor_column = str.pos().column;
+             return str.pos();
+           },
+           'w': function(editor, pos) {
              var str = stream({editor: editor, pos: pos});
 
              if(str.chr() && wrd_sep.test(str.chr())) {
@@ -627,6 +644,9 @@ define('ace/keyboard/envi/motions',
 
              editor.keyBinding.$data.cursor_column = str.pos().column;
              return str.pos();
+           },
+           'W': function(editor, pos) {
+             
            }
          };
          //var wht_spc = /\s/;
