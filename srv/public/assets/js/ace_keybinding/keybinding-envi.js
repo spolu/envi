@@ -229,7 +229,7 @@ define('ace/keyboard/envi/normal',
                'i$': function(match) {
                  that.setInsertMode();
                },
-               '([1-9]*)(h|j|k|l|\\$|\\^|0|e|E|w)$': function(match) {
+               '([1-9]*)(h|j|k|l|\\$|\\^|0|e|E|w|W|b)$': function(match) {
                  if(match[1].length === 0)
                    match[1] = '1';
                  if(motions[match[2]]) {
@@ -485,6 +485,7 @@ define('ace/keyboard/envi/motions',
            my.pos = { column: spec.pos.column, row: spec.pos.row };
            my.line = my.editor.session.getLine(my.pos.row);
            my.chr = my.line[my.pos.column] || '\n';
+           my.lines = 0;
 
            // public
            var next;
@@ -516,6 +517,7 @@ define('ace/keyboard/envi/motions',
              my.pos.column = 0;
              my.pos.row++;
              my.line = my.editor.session.getLine(my.pos.row);
+             my.lines++;
              return my.line[0] || '\n';
            };
 
@@ -525,6 +527,7 @@ define('ace/keyboard/envi/motions',
              my.pos.row--;
              my.line = my.editor.session.getLine(my.pos.row);
              my.pos.column = my.line.length;
+             my.lines--;
              return '\n';
            };
 
@@ -532,6 +535,7 @@ define('ace/keyboard/envi/motions',
            that.prev = prev;
            that.chr = function() { return my.chr; };
            that.pos = function() { return my.pos; };
+           that.lines = function() { return my.lines; };
            
            return that;
          }; 
@@ -617,13 +621,16 @@ define('ace/keyboard/envi/motions',
              var str = stream({editor: editor, pos: pos});
 
              var cur = str.next();
+             if(typeof str.chr() === 'undefined') return pos;
              var nxt = str.next();
-             while(str.chr() && !(!wht_spc.test(cur) && wht_spc.test(nxt))) {
-               console.log('cur: ' + cur + ' nxt: ' + nxt);
+             while(str.chr() && 
+                   !(!wht_spc.test(cur) && wht_spc.test(nxt)) &&
+                   str.lines() < 2) {
                cur = nxt;
                nxt = str.next();
              }
              str.prev();
+             if(str.lines() >= 2) str.prev();
              
              editor.keyBinding.$data.cursor_column = str.pos().column;
              return str.pos();
@@ -639,14 +646,47 @@ define('ace/keyboard/envi/motions',
                      !wht_spc.test(str.chr())) str.next();
              }
 
-             while(str.chr() && wht_spc.test(str.chr())) str.next();
+             while(str.chr() && wht_spc.test(str.chr()) && str.lines() < 2) str.next();
              if(!str.chr()) str.prev();
+             if(str.lines() >= 2) str.prev();
 
              editor.keyBinding.$data.cursor_column = str.pos().column;
              return str.pos();
            },
            'W': function(editor, pos) {
+             var str = stream({editor: editor, pos: pos});
+
+             var cur = str.chr();
+             var nxt = str.next();
+             while(str.chr() && 
+                   !(wht_spc.test(cur) && !wht_spc.test(nxt)) && 
+                   str.lines() < 2) {
+               cur = nxt;
+               nxt = str.next();
+             }
+             if(str.lines() >= 2) str.prev();
+             if(typeof str.chr() === 'undefined') str.prev();
              
+             editor.keyBinding.$data.cursor_column = str.pos().column;
+             return str.pos();
+           },
+           'b': function(editor, pos) {
+             var str = stream({editor: editor, pos: pos});
+
+             str.prev();
+             while(str.chr() && wht_spc.test(str.chr())) str.prev();
+
+             if(str.chr() && wrd_sep.test(str.chr())) {
+               while(str.chr() && wrd_sep.test(str.chr())) str.prev();
+             }
+             else { 
+               while(str.chr() && !wrd_sep.test(str.chr()) && 
+                     !wht_spc.test(str.chr())) str.prev();
+             }
+             str.next(); 
+
+             editor.keyBinding.$data.cursor_column = str.pos().column;
+             return str.pos();
            }
          };
          //var wht_spc = /\s/;
