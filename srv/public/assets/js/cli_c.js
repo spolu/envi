@@ -18,9 +18,7 @@ var cli_c = function(spec, my) {
   /*   BUILD                  */
   /****************************/
   build = function() {
-    my.element = $('<div/>').attr('id', 'envi-cli').addClass('envi-cli')
-                            .html('-- INSERT --');
-
+    my.element = $('<div/>').attr('id', 'envi-cli').addClass('envi-cli');
     return my.element;
   };
 
@@ -28,10 +26,10 @@ var cli_c = function(spec, my) {
   /*   REFRESH                */
   /****************************/
   /**
-   * @expects { display: '' }
+   * @expects { str: '' }
    */
   refresh = function(json) {
-
+    $('#envi-cli').html(json.str);
     _super.refresh(json);
   };
   
