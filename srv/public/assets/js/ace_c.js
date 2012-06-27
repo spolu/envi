@@ -30,24 +30,44 @@ var ace_c = function(spec, my) {
   /*   REFRESH                */
   /****************************/
   /**
-   * @expects {}
+   * @expects { focus: true|false }
    */
   refresh = function(json) {
-    setTimeout(function() {
-      if(!my.ace) {
-        my.ace = ace.edit(my.tile + '-ace');
-        my.ace.setTheme("ace/theme/envi");
-        my.ace.session.setFoldStyle('manual');
-        my.ace.setShowFoldWidgets(false);
-        my.ace.setKeyboardHandler(require("ace/keyboard/envi").handler);
-        //my.ace.setShowInvisibles(true);
-      }
-    }, 10);
+    if(!my.ace) {
+      my.ace = ace.edit(my.tile + '-ace');
+      my.ace.envi_tile = my.tile;
+      my.ace.session.setFoldStyle('manual');
+      my.ace.setShowFoldWidgets(false);
+      my.ace.setKeyboardHandler(require("ace/keyboard/envi").handler({}));
+      my.ace.setTheme("ace/theme/envi");
+      //my.ace.setShowInvisibles(true);
+      
+      my.ace.on('focus', function() {
+        console.log('FOCUS: ' + my.tile);
+      });
+      my.ace.on('envi-key', function(key) {
+        that.emit('key', key);
+      });
+      my.ace.getSession().selection.on('changeCursor', function() {
+        that.emit('cursor', my.ace.selection.getCursor());
+      });
+    }
+
+    if(json.focus) {
+      my.ace.focus();
+    }
+    else {
+      my.ace.blur();
+    }
+    my.ace.resize();
+
     _super.refresh(json);
   };
   
   CELL.method(that, 'build', build, _super);
   CELL.method(that, 'refresh', refresh, _super);
+
+  CELL.getter(that, 'ace', my, 'ace');
 
   return that;
 };

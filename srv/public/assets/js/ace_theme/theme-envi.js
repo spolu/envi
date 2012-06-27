@@ -12,7 +12,7 @@ define('ace/theme/envi', function(require, exports, module) {
     }\
     \
     .ace-envi .ace_gutter {\
-      background: #e8e8e8;\
+      background: #484848;\
       color: #333;\
     }\
     \

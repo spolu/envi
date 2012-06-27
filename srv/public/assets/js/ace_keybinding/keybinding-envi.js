@@ -48,33 +48,72 @@ define('ace/keyboard/envi',
        function(require, exports, module) {
          "use strict"
 
-         var modes = {};
+         exports.handler = function(spec, my) {
+           my = my || {};
 
-         exports.handler = {
+           my.modes = {};
 
-           handleKeyboard: function(data, hashId, key, keyCode, e) {
+           // public
+           var attach;            /* attach(editor); */
+           var detach;            /* detach(editor); */
+           var handleKeyboard;    /* handleKeyboard(data, hashId, key, keyCode, e) */
+
+           var that = {};
+
+           /**
+            * Handles all input key received by ace and distribute work to the current
+            * mode. Parameters are standard to ace infrastructure.
+            * @return an ace command
+            */
+           handleKeyboard = function(data, hashId, key, keyCode, e) {
              if(hashId !== 0 && (key == "" || key == "\x00"))
                return null;
 
              if(hashId === 1) key = "ctrl-" + key;
 
-             if(hashId === 1 || hashId === -1 || key === 'esc') {
-               return modes[data.mode].push(key);
+             // envi special keys
+             if(['ctrl-j', 'ctrl-k', 'ctrl-return'].indexOf(key) !== -1) {
+               my.editor._emit('envi-key', key);
+               console.log('ENVI INTERSECT: ' + key);
+               e.stopImmediatePropagation();
+               return null;
              }
-           },
 
-           attach: function(editor) {
-             modes['normalMode']     = require('./envi/normal').normal({ editor: editor });
-             modes['insertMode']     = require('./envi/insert').insert({ editor: editor });
-             modes['visualMode']     = require('./envi/visual').visual({ editor: editor });
-             modes['visualLineMode'] = require('./envi/visual_line').visual_line({ editor: editor });
+             if(hashId === 1 || hashId === -1 || key === 'esc') {
+               return my.modes[data.mode].push(key);
+             }
+           };
 
-             modes['normalMode'].setNormalMode();
-           },
+           /**
+            * Called when the editor is first attached to this keyboard handler
+            * @param editor the ace editor
+            */
+           attach = function(editor) {
+             my.editor = editor;
+             console.log('ATTACH: ' + editor.envi_tile);
+             my.modes['normalMode']     = require('./envi/normal').normal({ editor: editor });
+             my.modes['insertMode']     = require('./envi/insert').insert({ editor: editor });
+             my.modes['visualMode']     = require('./envi/visual').visual({ editor: editor });
+             my.modes['visualLineMode'] = require('./envi/visual_line').visual_line({ editor: editor });
 
-           detach: function(editor) {
-           }
+             my.modes['normalMode'].setNormalMode();
+           };
+
+           /**
+            * Called when the editor is detached from this keyboard handler
+            * @param editor the ace editor
+            */
+           detach = function(editor) {
+             console.log('DETACH: ' + editor.envi_tile);
+           };
+           
+           that.handleKeyboard = handleKeyboard;
+           that.attach = attach;
+           that.detach = detach;
+
+           return that;
          };
+
        });
 
 
@@ -142,6 +181,7 @@ define('ace/keyboard/envi/mode',
             * it accumulates characters and call `exec` on itself
             * (the mode) to handle it
             * @param key the key received
+            * @param editor the editor
             * @returns the generated editor command
             */
            push = function(key) {
@@ -153,7 +193,7 @@ define('ace/keyboard/envi/mode',
                default:
                  if(that.exec) {
                    my.buffer += key;
-                   console.log('[' + my.mode + '] "' + my.buffer + '"'); 
+                   console.log('[' + my.mode + '] "' + my.buffer + '" ' + my.editor.envi_tile); 
                    return that.exec();
                  }
              }

@@ -25,12 +25,16 @@ var tile_c = function(spec, my) {
                                  container: my.container,
                                  tile: my.id });
     my.element.append(my.children['ace'].build());
-    /*
+
     my.children['status'] = status_c({ path: my.path + '/status',
                                        container: my.container,
                                        tile: my.id });
     my.element.append(my.children['status'].build());
-    */
+
+    my.children['ace'].on('cursor', function(pos) {
+      my.children['status'].refresh({ row: pos.row,
+                                      col: pos.column });
+    });
 
     return my.element;
   };
@@ -52,7 +56,8 @@ var tile_c = function(spec, my) {
     else
       my.element.removeClass('focus');
 
-    _super.refresh({ ace: '' });
+    _super.refresh({ ace: { focus: json.focus},
+                     status: {} });
   };
   
   CELL.method(that, 'build', build, _super);

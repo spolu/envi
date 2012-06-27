@@ -52,17 +52,24 @@ var main_ct = function(spec, my) {
     top.append(my.children['space'].build());
 
     // handlers
+    my.children['space'].on('key', function(key) {
+      console.log('KEY: ' + key);
+      switch(key) {
+        case 'ctrl-j':
+          my.focus = (my.focus + 1) % my.tiles.length;
+          that.refresh();
+          break;
+        case 'ctrl-k':
+          my.focus = (my.focus - 1 + my.tiles.length) % my.tiles.length;
+          that.refresh();
+          break;
+        case 'ctrl-enter':
+          break;
+      };
+    });
     $(document).keypress(function(evt) {
       if(evt.ctrlKey) {
         switch(evt.keyCode) {
-          case 10: // j
-            my.focus = (my.focus + 1) % my.tiles.length;
-            that.refresh();
-            break;
-          case 11: // k
-            my.focus = (my.focus - 1 + my.tiles.length) % my.tiles.length;
-            that.refresh();
-            break;
           case 13: // enter
             if(evt.shiftKey) {
               my.tiles.unshift('t' + (my.next_id++));
