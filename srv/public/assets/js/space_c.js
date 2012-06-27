@@ -61,7 +61,15 @@ var space_c = function(spec, my) {
     
     json.tiles.forEach(function(id, i) {
       var t = tile(id);
-      if(i === 0) {
+      my.element.append(t.element());
+      if(i === 0 && len === 1) {
+        t.refresh({ left: '0px', 
+                    top: '0px',
+                    width: '100%', 
+                    height: '100%',
+                    focus: json.focus === i });
+      }
+      else if(i === 0) {
         t.refresh({ left: '0px', 
                     top: '0px',
                     width: '50%', 
@@ -75,7 +83,6 @@ var space_c = function(spec, my) {
                     height: step + '%',
                     focus: json.focus === i });
       }
-      my.element.append(t.element());
     });
 
     _super.refresh(json);

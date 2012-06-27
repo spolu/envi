@@ -18,9 +18,9 @@ var main_ct = function(spec, my) {
   var _super = {};
   my = my || {};
 
-  my.tiles = ['t2', 't3', 't5'];
-  my.focus = 2;
-  my.next_id = 6;
+  my.tiles = [];
+  my.focus = -1;
+  my.next_id = 0;
 
   my.json = { 
     space: { 
@@ -53,15 +53,14 @@ var main_ct = function(spec, my) {
 
     // handlers
     $(document).keypress(function(evt) {
-      console.log(evt);
       if(evt.ctrlKey) {
         switch(evt.keyCode) {
           case 10: // j
-            my.focus = (my.focus - 1 + my.tiles.length) % my.tiles.length;
+            my.focus = (my.focus + 1) % my.tiles.length;
             that.refresh();
             break;
           case 11: // k
-            my.focus = (my.focus + 1) % my.tiles.length;
+            my.focus = (my.focus - 1 + my.tiles.length) % my.tiles.length;
             that.refresh();
             break;
           case 13: // enter
