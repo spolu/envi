@@ -1,0 +1,26 @@
+~/
+--
+
+{ stream: [ { server: 'stream.envi.cc',
+              user: 'spolu',
+              auth: '83033c556e52304dd09de660c8f65750' },
+            { server: 'envi.teleportd.com',
+              user: 'spolu',
+              auth: 'ca0b1c79c44cd6ffc1be03dc6af4a722' }]
+}
+
+~/teleportd/src
+---------------
+
+{ stream: [ { server: 'envi.teleportd.com',
+              to: ['#teleportd', '@llorca'] } ]
+}
+
+~/Projectes/envi
+----------------
+
+{ stream: [ { server: 'stream.envi.cc,
+              to: ['#public'] },
+            { server: 'envi.teleportd.com',
+              to: ['#public'] ]
+}  
