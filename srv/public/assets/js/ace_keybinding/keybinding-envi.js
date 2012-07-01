@@ -74,7 +74,6 @@ define('ace/keyboard/envi',
              // envi special keys
              if(['ctrl-j', 'ctrl-k', 'ctrl-return'].indexOf(key) !== -1) {
                my.editor._emit('envi-key', key);
-               console.log('ENVI INTERSECT: ' + key);
                e.stopImmediatePropagation();
                return null;
              }
@@ -365,6 +364,15 @@ define('ace/keyboard/envi/normal',
                },
                'i$': function(match) {
                  that.setInsertMode();
+                 my.buffer = '';
+               },
+               '\:$': function(match) {
+                 my.editor._emit('envi-cmd');
+                 my.buffer = '';
+               },
+               '\/$': function(match) {
+                 my.editor._emit('envi-find');
+                 my.buffer = '';
                }
              };
 

@@ -67,21 +67,21 @@ var space_c = function(spec, my) {
                     top: '0px',
                     width: '100%', 
                     height: '100%',
-                    focus: json.focus === i });
+                    focus: (json.focus === i && !json.cli) });
       }
       else if(i === 0) {
         t.refresh({ left: '0px', 
                     top: '0px',
                     width: '50%', 
                     height: '100%',
-                    focus: json.focus === i });
+                    focus: (json.focus === i && !json.cli) });
       }
       else {
         t.refresh({ left: '50%', 
                     top: (step * (i-1)) + '%',
                     width: '50%', 
                     height: step + '%',
-                    focus: json.focus === i });
+                    focus: (json.focus === i && !json.cli) });
       }
     });
 

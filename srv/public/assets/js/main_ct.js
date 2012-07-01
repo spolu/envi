@@ -20,14 +20,17 @@ var main_ct = function(spec, my) {
 
   my.tiles = [];
   my.focus = -1;
+
   my.next_id = 0;
 
   my.json = { 
     space: { 
       tiles: [],
-      focus: -1 
+      focus: -1,
+      cli: false
     },
-    cli: { str: '-- INSERT --' }
+    cli: { active: my.cli,
+           str: '' }
   };
 
 
@@ -36,6 +39,8 @@ var main_ct = function(spec, my) {
   var refresh; /* refresh(); */
 
   // private
+  var do_ex;   /* do_ex(); */
+  
 
   var that = CELL.container({ name: 'main' }, my);
 
@@ -51,22 +56,9 @@ var main_ct = function(spec, my) {
     my.children['space'] = space_c({ path: '/' + my.name + '/space', container: that });
     top.append(my.children['space'].build());
 
-    // handlers
-    my.children['space'].on('key', function(key) {
-      console.log('KEY: ' + key);
-      switch(key) {
-        case 'ctrl-j':
-          my.focus = (my.focus + 1) % my.tiles.length;
-          that.refresh();
-          break;
-        case 'ctrl-k':
-          my.focus = (my.focus - 1 + my.tiles.length) % my.tiles.length;
-          that.refresh();
-          break;
-        case 'ctrl-enter':
-          break;
-      };
-    });
+    /****************************************
+     * HANDLERS                             *
+     ****************************************/
     $(document).keypress(function(evt) {
       if(evt.ctrlKey) {
         switch(evt.keyCode) {
@@ -86,6 +78,55 @@ var main_ct = function(spec, my) {
         }
       }
     });
+
+    my.children['space'].on('key', function(key) {
+      switch(key) {
+        case 'ctrl-j':
+          my.focus = (my.focus + 1) % my.tiles.length;
+          that.refresh();
+          break;
+        case 'ctrl-k':
+          my.focus = (my.focus - 1 + my.tiles.length) % my.tiles.length;
+          that.refresh();
+          break;
+        case 'ctrl-enter':
+          break;
+      };
+    });
+    
+    my.children['space'].on('focus', function(tile) {
+      if(tile !== my.tiles[my.focus]) {
+        var idx = my.tiles.indexOf(tile);
+        if(idx !== -1) {
+          my.focus = idx;
+          that.refresh();
+        }
+      }
+    });
+
+    my.children['space'].on('cli', function(str) {
+      console.log('CLI: ' + str);
+      my.json.space.cli = true;
+      my.json.cli.active = true;
+      my.json.cli.str = str;
+      that.refresh();
+    });
+
+    my.children['cli'].on('done', function(ex) {
+      my.json.space.cli = false;
+      my.json.cli.active = false;
+      my.json.cli.str = '';
+      do_ex(ex);
+      that.refresh();
+    });
+
+    my.children['cli'].on('cancel', function() {
+      my.json.space.cli = false;
+      my.json.cli.active = false;
+      my.json.cli.str = '';
+      that.refresh();
+    });
+    
   };
 
 
@@ -96,6 +137,18 @@ var main_ct = function(spec, my) {
     my.json.space.tiles = my.tiles;
     my.json.space.focus = my.focus;
     _super.refresh();
+  };
+
+  /*****************************************
+   * PRIVATE HELPER FUNCTIONS              *
+   *****************************************/
+  /**
+   * Execute a command received form the cli interface. This functions
+   * receives the bare string a submitted by the suer
+   * @param ex the command to execute
+   */
+  do_ex = function(ex) {
+    console.log('EXECUTE: ' + ex);
   };
 
 

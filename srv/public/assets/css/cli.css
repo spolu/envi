@@ -9,6 +9,69 @@
   padding-bottom: 0.1em;
 
   background-color: #1c1c1e;
-  color: white;
 }
+
+/*************************
+ * DISPLAY               *
+ ************************/
+.envi-cli .display {
+  height: 100%;
+  width: 100%;
+  color: white;
+  
+  display: none;
+}
+
+.envi-cli .display.active {
+  display: block;
+}
+
+/*************************
+ * TEXTAREA              *
+ ************************/
+.envi-cli textarea {
+  position: absolute;
+  height: 100%;
+  width: 50%;  
+
+  background-color: rgba(0,0,0,0);
+  color: white;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Droid Sans Mono', 'Consolas', monospace; 
+
+  border: 0px solid white;
+  padding: 0;
+  margin: 0;
+
+  outline-style: none;
+  resize: none;
+
+  display: none;
+}
+
+.envi-cli textarea.active {
+  display: block;
+}
+
+
+/*************************
+ * SUGGESTION            *
+ ************************/
+.envi-cli .suggestion {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+
+  background-color: rgba(0,0,0,0);
+  color: grey;
+
+  text-align: right;
+
+  display: none;
+}
+
+.envi-cli .suggestion.active {
+  display: block;
+}
+
 

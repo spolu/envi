@@ -11,6 +11,10 @@ var io = require('socket.io').listen(app);
 // cfg
 var cfg = fwk.populateConfig(require("./config.js").config);
 
+// edit
+var edit = require('./lib/edit.js').edit({cfg: cfg});
+
+
 // Use Express to serve static content, such as our index.html
 app.configure(function(){
   app.use(express.static(__dirname + '/public'));
@@ -27,6 +31,31 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+
+// Routes
+
+app.get( '/open', function(req, res, next) {
+  var path = req.param('path');
+});
+app.put( '/save', function(req, res, next) {
+  var path = req.param('path');
+});
+app.get( '/autocomplete', function(req, res, next) {
+  var path = req.param('path');
+  var current = req.param('current');
+
+  edit.autocomplete(path, current, function(err, paths) {
+    if(err) {
+      res.send(err.message, 500);
+    }
+    else {
+      res.json({ ok: true,
+                 paths: paths });
+    }
+  });
+});
+
+
 //Socket.io emits this event when a connection is made.
 io.sockets.on('connection', function (socket) {
 
@@ -38,10 +67,6 @@ io.sockets.on('connection', function (socket) {
     console.log(data.msg);
   });
 
-});
-
-app.get('/test', function(req, res, next) {
-  res.json({ok: true});
 });
 
 app.listen(35710, '127.0.0.1');

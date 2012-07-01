@@ -43,10 +43,19 @@ var ace_c = function(spec, my) {
       //my.ace.setShowInvisibles(true);
       
       my.ace.on('focus', function() {
-        console.log('FOCUS: ' + my.tile);
+        that.emit('focus', my.tile);
+      });
+      my.ace.on('blur', function() {
+        console.log('BLUR: ' + my.tile);
       });
       my.ace.on('envi-key', function(key) {
         that.emit('key', key);
+      });
+      my.ace.on('envi-cmd', function() {
+        that.emit('cli', ':');
+      });
+      my.ace.on('envi-find', function() {
+        that.emit('cli', '/');
       });
       my.ace.getSession().selection.on('changeCursor', function() {
         that.emit('cursor', my.ace.selection.getCursor());
