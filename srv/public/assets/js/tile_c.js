@@ -21,17 +21,17 @@ var tile_c = function(spec, my) {
   build = function() {
     my.element = $('<div/>').addClass('envi-tile');
 
-    my.children['ace'] = ace_c({ path: my.path + '/ace',
-                                 container: my.container,
-                                 tile: my.id });
-    my.element.append(my.children['ace'].build());
+    my.children['editor'] = editor_c({ path: my.path + '/editor',
+                                       container: my.container,
+                                       tile: my.id });
+    my.element.append(my.children['editor'].build());
 
     my.children['status'] = status_c({ path: my.path + '/status',
                                        container: my.container,
                                        tile: my.id });
     my.element.append(my.children['status'].build());
 
-    my.children['ace'].on('cursor', function(pos) {
+    my.children['editor'].on('cursor', function(pos) {
       my.children['status'].refresh({ row: pos.row,
                                       col: pos.column });
     });
@@ -56,7 +56,7 @@ var tile_c = function(spec, my) {
     else
       my.element.removeClass('focus');
 
-    _super.refresh({ ace: { focus: json.focus},
+    _super.refresh({ editor: { focus: json.focus},
                      status: {} });
   };
   

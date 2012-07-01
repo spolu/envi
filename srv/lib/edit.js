@@ -21,8 +21,8 @@ var edit = function(spec, my) {
   my.cfg = spec.cfg; 
 
   // public
-  var open;          /* open(path, cb); */
-  var save;          /* save(path, buf, cb); */
+  var read;          /* read(path, cb); */
+  var write;         /* write(path, buf, cb); */
   var autocomplete;  /* autocomplete(path, current, cb) */
 
   // private
@@ -81,8 +81,8 @@ var edit = function(spec, my) {
    * @param path the file path
    * @param cb(err, buf) the callback
    */
-  open = function(path, cb) {
-
+  read = function(path, cb) {
+    fs.readFile(path, 'utf8', cb);
   };
 
   /**
@@ -132,15 +132,16 @@ var edit = function(spec, my) {
    * @param buf the buffer
    * @param cb(err) the callback
    */
-  save = function(path, buf, cb) {
+  write = function(path, buf, cb) {
+    fs.writeFile(path, buf, 'utf8', cb);
   };
 
   fwk.method(that, 't_get_home', get_home, _super);
   fwk.method(that, 't_ac_base', ac_base, _super);
 
-  fwk.method(that, 'open', open, _super);
+  fwk.method(that, 'read', read, _super);
   fwk.method(that, 'autocomplete', autocomplete, _super);
-  fwk.method(that, 'save', save, _super);
+  fwk.method(that, 'write', write, _super);
 
   return that;
 };

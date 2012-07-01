@@ -1,7 +1,7 @@
 /******************************/
-/*   ACE CELL                 */
+/*   EDITOR CELL              */
 /******************************/
-var ace_c = function(spec, my) {
+var editor_c = function(spec, my) {
   var _super = {};
   my = my || {};
 
@@ -19,7 +19,7 @@ var ace_c = function(spec, my) {
   /*   BUILD                  */
   /****************************/
   build = function() {
-    my.element = $('<div/>').addClass('envi-ace').attr('id', my.tile + '-ace'); 
+    my.element = $('<div/>').addClass('envi-editor').attr('id', my.tile + '-editor'); 
     // test
     //my.element.html('test here a,.,.a ,., a,., ,.,a aasa s s\nvar it = function() {\n}\n\n\n\nok\n\n,\n\nhophon');
 
@@ -34,7 +34,7 @@ var ace_c = function(spec, my) {
    */
   refresh = function(json) {
     if(!my.ace) {
-      my.ace = ace.edit(my.tile + '-ace');
+      my.ace = ace.edit(my.tile + '-editor');
       my.ace.envi_tile = my.tile;
       my.ace.session.setFoldStyle('manual');
       my.ace.setShowFoldWidgets(false);

@@ -34,11 +34,35 @@ app.configure('production', function(){
 
 // Routes
 
-app.get( '/open', function(req, res, next) {
+app.get( '/file', function(req, res, next) {
   var path = req.param('path');
+
+  edit.read(path, function(err, buf) {
+    if(err) {
+      res.send(err.message, 500);
+    }
+    else {
+      res.send(buf);
+    }
+  });
 });
-app.put( '/save', function(req, res, next) {
+app.put( '/file', function(req, res, next) {
   var path = req.param('path');
+  var buf = '';
+  res.on('data', function(chunk) {
+    buf += chunk;
+  });
+  res.on('end', function() {
+    console.log('writing: ' + path);
+    edit.write(path, buf, function(err) {
+      if(err) {
+        res.send(err.message, 500);
+      }
+      else {
+        res.json({ ok: true });
+      }
+    });
+  });
 });
 app.get( '/autocomplete', function(req, res, next) {
   var path = req.param('path');

@@ -35,11 +35,11 @@ var main_ct = function(spec, my) {
 
 
   // public
-  var load;    /* load(); */
-  var refresh; /* refresh(); */
+  var load;      /* load(); */
+  var refresh;   /* refresh(); */
 
   // private
-  var do_ex;   /* do_ex(); */
+  var execute;   /* execute(); */
   
 
   var that = CELL.container({ name: 'main' }, my);
@@ -116,7 +116,7 @@ var main_ct = function(spec, my) {
       my.json.space.cli = false;
       my.json.cli.active = false;
       my.json.cli.str = '';
-      do_ex(ex);
+      execute(ex);
       that.refresh();
     });
 
@@ -147,8 +147,25 @@ var main_ct = function(spec, my) {
    * receives the bare string a submitted by the suer
    * @param ex the command to execute
    */
-  do_ex = function(ex) {
-    console.log('EXECUTE: ' + ex);
+  execute = function(ex) {
+    if(ex.length > 0 && ex[0] === ':') {
+      var cmp = ex.split(' ');
+      var cmd = cmp.shift();
+      var arg = cmp.join(' '); 
+
+      if(cmd === ':e') {
+        var tile = 't' + (my.next_id++);
+        my.tiles.unshift(tile);
+        my.focus = 0;
+        that.refresh();
+
+        $.get('/file?path=' + arg)
+          .success(function(buf) {
+            that.find('/space/' + tile + '/editor').ace().session.setValue(buf);
+          });
+      }
+    }
+    
   };
 
 
