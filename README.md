@@ -28,7 +28,7 @@
 
 ### Getting Started
 
-```
+```bash
 $ git clone git://github.com/spolu/envi.git
 $ cd envi/srv
 $ npm install
