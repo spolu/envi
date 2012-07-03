@@ -26,6 +26,18 @@
 - nodeJS  
 - socket.IO (for read-only edit streams)
 
+### Getting Started
+
+```
+$ git clone git://github.com/spolu/envi.git
+$ cd envi/srv
+$ npm install
+$ node app.js
+# Go to http://127.0.0.1:35710
+# ctrl+shift+enter to open a new editor
+# :e FILENAME to open a file
+```
+
 ### Get Involved
 
 IRC ChanneL: #envi (freenode)
