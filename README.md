@@ -41,4 +41,9 @@ $ node app.js
 ### Get Involved
 
 IRC ChanneL: #envi (freenode)
+
+### Contributors
+
+@spolu (Stanislas Polu)
+@AdrienGiboire (Adrien)
  
