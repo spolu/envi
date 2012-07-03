@@ -44,6 +44,6 @@ IRC ChanneL: #envi (freenode)
 
 ### Contributors
 
-@spolu (Stanislas Polu)
-@AdrienGiboire (Adrien)
+- @spolu (Stanislas Polu)
+- @AdrienGiboire (Adrien)
  
