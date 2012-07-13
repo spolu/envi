@@ -24,6 +24,7 @@ var edit = function(spec, my) {
   var read;          /* read(path, cb); */
   var write;         /* write(path, buf, cb); */
   var autocomplete;  /* autocomplete(path, current, cb) */
+  var autosave;      /* autosave(path, buf, cb); */
 
   // private
   var get_home;      /* get_home(); */
@@ -82,7 +83,14 @@ var edit = function(spec, my) {
    * @param cb(err, buf) the callback
    */
   read = function(path, cb) {
-    fs.readFile(path, 'utf8', cb);
+    fs.readFile(path + '.swp', 'utf8', function(err, buf) {
+      if(err) {
+        fs.readFile(path, 'utf8', cb);
+      }
+      else {
+        cb(null, buf);
+      }
+    });
   };
 
   /**
@@ -133,7 +141,23 @@ var edit = function(spec, my) {
    * @param cb(err) the callback
    */
   write = function(path, buf, cb) {
-    fs.writeFile(path, buf, 'utf8', cb);
+    fs.writeFile(path, buf, 'utf8', function(err) {
+      if(err) cb(err);
+      else {
+        fs.unlink(path + '.swp', cb);
+      }
+    });
+  };
+
+  /**
+   * Save the content of file in a different file to allow
+   * recovering data if something wrong happens
+   * @param path the file path
+   * @param buf the buffer
+   * @param cb(err) the callback
+   */ 
+  autosave = function(path, buf, cb) {
+    fs.writeFile(path + '.swp', buf, 'utf8', cb);
   };
 
   fwk.method(that, 't_get_home', get_home, _super);
@@ -142,6 +166,7 @@ var edit = function(spec, my) {
   fwk.method(that, 'read', read, _super);
   fwk.method(that, 'autocomplete', autocomplete, _super);
   fwk.method(that, 'write', write, _super);
+  fwk.method(that, 'autosave', autosave, _super);
 
   return that;
 };
