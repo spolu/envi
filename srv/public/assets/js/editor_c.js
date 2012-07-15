@@ -6,6 +6,7 @@ var editor_c = function(spec, my) {
   my = my || {};
 
   my.tile = spec.tile;
+  my.USER_KEYS = ['ctrl-j', 'ctrl-k', 'ctrl-return'];
 
   // public
   var build;   /* build(); */
@@ -38,7 +39,8 @@ var editor_c = function(spec, my) {
       my.ace.envi_tile = my.tile;
       my.ace.session.setFoldStyle('manual');
       my.ace.setShowFoldWidgets(false);
-      my.ace.setKeyboardHandler(require("ace/keyboard/envi").handler({}));
+      my.ace.setKeyboardHandler(require("ace/keyboard/envi")
+        .handler({ user_keys: my.USER_KEYS }));
       my.ace.setTheme("ace/theme/envi");
       //my.ace.setShowInvisibles(true);
       
@@ -48,13 +50,13 @@ var editor_c = function(spec, my) {
       my.ace.on('blur', function() {
         console.log('BLUR: ' + my.tile);
       });
-      my.ace.on('envi-key', function(key) {
+      my.ace.on('user_key', function(key) {
         that.emit('key', key);
       });
-      my.ace.on('envi-cmd', function() {
+      my.ace.on('user_cmd', function() {
         that.emit('cli', ':');
       });
-      my.ace.on('envi-find', function() {
+      my.ace.on('user_find', function() {
         that.emit('cli', '/');
       });
       my.ace.getSession().selection.on('changeCursor', function() {

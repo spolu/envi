@@ -74,7 +74,7 @@ var cli_c = function(spec, my) {
       setTimeout(function() {
         $('#envi-cli textarea').focus();
         $('#envi-cli textarea').get(0).setSelectionRange(1,1);
-      }, 100);
+      }, 50);
     }
 
     _super.refresh(json);

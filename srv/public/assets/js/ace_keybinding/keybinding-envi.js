@@ -48,10 +48,20 @@ define('ace/keyboard/envi',
        function(require, exports, module) {
          "use strict"
 
+         /**
+          * The Handler Object
+          *
+          * Classical Handler Wrapper with the specificity of letting
+          * the user specify a set of key that should be emitted on a
+          * 'user_key' event
+          *
+          * @param spec {user_keys}
+          */
          exports.handler = function(spec, my) {
            my = my || {};
 
            my.modes = {};
+           my.user_keys = spec.user_keys || [];
 
            // public
            var attach;            /* attach(editor); */
@@ -71,9 +81,9 @@ define('ace/keyboard/envi',
 
              if(hashId === 1) key = "ctrl-" + key;
 
-             // envi special keys
-             if(['ctrl-j', 'ctrl-k', 'ctrl-return'].indexOf(key) !== -1) {
-               my.editor._emit('envi-key', key);
+             // user keys
+             if(my.user_keys.indexOf(key) !== -1) {
+               my.editor._emit('user_key', key);
                e.stopImmediatePropagation();
                return null;
              }
@@ -367,11 +377,11 @@ define('ace/keyboard/envi/normal',
                  my.buffer = '';
                },
                '\:$': function(match) {
-                 my.editor._emit('envi-cmd');
+                 my.editor._emit('user_cmd');
                  my.buffer = '';
                },
                '\/$': function(match) {
-                 my.editor._emit('envi-find');
+                 my.editor._emit('user_find');
                  my.buffer = '';
                }
              };

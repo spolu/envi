@@ -6,6 +6,9 @@ var tile_c = function(spec, my) {
   my = my || {};
 
   my.id = spec.id;
+  
+  my.path = undefined;
+  my.dirty = false;
 
   // public
   var build;   /* build(); */
@@ -56,12 +59,77 @@ var tile_c = function(spec, my) {
     else
       my.element.removeClass('focus');
 
+    console.log(my.path);
     _super.refresh({ editor: { focus: json.focus},
                      status: {} });
   };
+
+
+  /**
+   * warns the user through the status bar
+   * @param msg the warn message
+   */
+  warn = function(msg) {
+    my.children['status'].warn(msg);
+  };
+
+  /**
+   * attempt to close the tile. The tile will be closed if the editor
+   * accepts it (no outstanding changes or the force argument is set)
+   * @param force force close
+   */
+  close = function(force) {
+    if(my.dirty && !force) {
+      my.children['status'].warn('No write since last change');
+    }
+    else {
+      that.emit('destroy', my.id);
+    }
+  };
   
+
+  /**
+   * opens a file by retrieving its content from the server and pushing
+   * it to the editor. It also updates the status bar
+   * @param p the file path to open
+   */
+  open = function(p) {
+    $.get('/file?path=' + p)
+      .success(function(buf) {
+        my.children['editor'].ace().session.setValue(buf);
+        my.dirty = false;
+        my.path = p;
+      });
+  };
+
+  /**
+   * saves the file and remove its dirtiness. It also updates the status
+   * bar to show that the file is not dirty anymore
+   */
+  save = function() {
+    console.log('SAVE: ' + my.path);
+    console.log(my.children['editor'].ace().session.getValue());
+    if(typeof my.path !== undefined) {
+      $.ajax({ url: '/file?path=' + my.path,
+               data: my.children['editor'].ace().session.getValue(),
+               type: 'PUT' })
+        .success(function() {
+          console.log('DONE');
+          my.dirty = false;
+        });
+    }
+    else {
+      my.children['status'].warn('No file');
+    }
+  };
+
+
   CELL.method(that, 'build', build, _super);
   CELL.method(that, 'refresh', refresh, _super);
+
+  CELL.method(that, 'close', close, _super);
+  CELL.method(that, 'open', open, _super);
+  CELL.method(that, 'save', save, _super);
 
   return that;
 };

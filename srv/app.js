@@ -19,7 +19,6 @@ var edit = require('./lib/edit.js').edit({cfg: cfg});
 app.configure(function(){
   app.use(express.static(__dirname + '/public'));
   app.use(express.cookieParser());
-  app.use(express.bodyParser());
   app.use(express.methodOverride());
 });
 
@@ -46,24 +45,27 @@ app.get( '/file', function(req, res, next) {
     }
   });
 });
+
 app.put( '/file', function(req, res, next) {
+  req.setEncoding('utf8');
   var path = req.param('path');
   var buf = '';
-  res.on('data', function(chunk) {
+  req.on('data', function(chunk) {
     buf += chunk;
   });
-  res.on('end', function() {
-    console.log('writing: ' + path);
+  req.on('end', function() {
     edit.write(path, buf, function(err) {
       if(err) {
         res.send(err.message, 500);
       }
       else {
+        console.log('write ' + path);
         res.json({ ok: true });
       }
     });
   });
 });
+
 app.get( '/autocomplete', function(req, res, next) {
   var path = req.param('path');
   var current = req.param('current');
